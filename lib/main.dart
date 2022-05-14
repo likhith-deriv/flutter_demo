@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import './question.dart';
-import './answer.dart';
+import './result.dart';
+import './quiz.dart';
 
 void main() => runApp(const MyApp());
 
@@ -14,49 +14,69 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static const questions = [
+  static const _questions = [
     {
       'questionText': 'What\'s your favorite color?',
-      'answers': ['Black', 'Red', 'Green', 'White']
+      'answers': [
+        {'text': 'Black', 'score': 10},
+        {'text': 'Red', 'score': 5},
+        {'text': 'Green', 'score': 3},
+        {'text': 'White', 'score': 1}
+      ]
     },
     {
       'questionText': 'What\'s your favorite animal?',
-      'answers': ['Rabbit', 'Snake', 'Lion', 'Elephant']
+      'answers': [
+        {'text': 'Lion', 'score': 10},
+        {'text': 'Snake', 'score': 5},
+        {'text': 'Elephant', 'score': 3},
+        {'text': 'Rabbit', 'score': 1}
+      ]
     },
     {
       'questionText': 'What\'s your favorite dish?',
-      'answers': ['Custard', 'Cake', 'Burger', 'Pizza']
+      'answers': [
+        {'text': 'Pizza', 'score': 10},
+        {'text': 'Burger', 'score': 5},
+        {'text': 'Cake', 'score': 3},
+        {'text': 'Custard', 'score': 1}
+      ]
     }
   ];
   var _questionIndex = 0;
   var isQuestionAvailable = true;
+  var _totalScore = 0;
 
-  void _answerQuestion() {
-    if (_questionIndex >= questions.length) {
+  void _resetQuiz() {
+    setState(() {
+      _questionIndex = 0;
+      _totalScore = 0;
+      isQuestionAvailable = true;
+    });
+  }
+
+  void _answerQuestion(int score) {
+    _totalScore += score;
+    if (_questionIndex > _questions.length - 2) {
       isQuestionAvailable = false;
     }
     setState(() {
       _questionIndex += 1;
     });
-    print(_questionIndex);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        title: const Text('My First App'),
-      ),
-      body: Column(
-        children: [
-          Question(questions[_questionIndex]['questionText'] as String),
-          ...(questions[_questionIndex]['answers'] as List<String>)
-              .map((answer) =>
-                  (Answer(answerText: answer, selectHandler: _answerQuestion)))
-              .toList()
-        ],
-      ),
-    ));
+            appBar: AppBar(
+              title: const Text('My First App'),
+            ),
+            body: isQuestionAvailable
+                ? Quiz(
+                    questions: _questions,
+                    answerQuestion: _answerQuestion,
+                    questionIndex: _questionIndex)
+                : Result(resultScore: _totalScore, resetHandler: _resetQuiz)));
   }
 }
